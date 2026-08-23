@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Inventory Dashboard</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            background-color: #fcfaf7; 
+            color: #2d2d2d; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        h1 { color: #58111A; margin-top: 0; }
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
+        #search-box { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; }
+        
+        table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 6px; overflow: hidden; }
+        th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th { background-color: #58111A; color: white; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
+        tr:hover { background-color: #faf6f6; }
+        
+        .img-cell-wrapper {
+            position: relative; 
+            width: 50px; 
+            height: 50px;
+        }
+
+        /* Base thumbnail view */
+        .wine-pic { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+            border: 1px solid #ddd; 
+            background: #f3f4f6; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px;
+            /* Smoothly animates both position scales and rotation angles back to normal */
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.6s ease;
+        }
+        
+        /* Interactive screen-relative large zoom AND spinning on hover */
+        .wine-pic:hover {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* translate positions it, scale grows it, and rotate spins it a full 360 degrees */
+            transform: translate(-50%, -50%) scale(1) rotate(360deg); 
+            width: auto;
+            height: 50vh; 
+            max-width: 90vw;
+            object-fit: contain; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 100vw rgba(0,0,0,0.25); 
+            border-radius: 12px;
+            z-index: 9999; 
+            border: 4px solid #fff;
+            cursor: zoom-out;
+        }
+        
+        .qty-controls { display: flex; align-items: center; gap: 8px; }
+        .btn-qty { background: #e5e7eb; color: #1f2937; border: none; padding: 4px 10px; font-size: 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-qty:hover { background: #d1d5db; }
+        .qty-val { font-weight: bold; min-width: 20px; text-align: center; }
+        .low-stock { color: #b91c1c; background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 5px; }
+        
+        .notice-banner { background-color: #fef3c7; color: #92400e; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; border: 1px solid #fde68a; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🍷 My Wine Inventory</h1>
+        
+        <div class="notice-banner">
+            ℹ️ <strong>Note:</strong> Pressing <strong>+</strong> or <strong>−</strong> tracks consumption in your browser session. To permanently update counts, edit your <code>inventory.csv</code> spreadsheet file in VS Code.
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="search-box" placeholder="🔍 Search by winery, grape type, layout location...">
+        </div>
+
+        <table id="inventory-table">
+            <thead>
+                <tr>
+                    <th>Bottle</th>
+                    <th>Winery</th>
+                    <th>Wine Name</th>
+                    <th>Vintage</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Bin Location</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td colspan="7">Loading inventory file...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const tableBody = document.getElementById('table-body');
+        const searchBox = document.getElementById('search-box');
+
+        async function loadInventory() {
+            try {
+                const response = await fetch('inventory.csv');
+                if (!response.ok) throw new Error('Could not find inventory.csv');
+                
+                const csvText = await response.text();
+                
+                const rows = csvText.trim().split('\n')
+                    .map(row => row.split(','))
+                    .filter(row => row.length > 1 && row !== '');
+                
+                rows.shift(); 
+                
+                renderTable(rows);
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="color:red; font-weight:bold;">Error: ${error.message}. Make sure inventory.csv is in the same folder.</td></tr>`;
+            }
+        }
+
+        function renderTable(rows) {
+            tableBody.innerHTML = '';
+            
+            rows.forEach((row) => {
+                const tr = document.createElement('tr');
+                
+                const winery = row[0];
+                const wineName = row[1];
+                const vintage = row[2];
+                const type = row[3];
+                let quantity = parseInt(row[4]) || 0;
+                const binLocation = row[5] || 'N/A';
+                const imagePath = row[6] ? row[6].trim() : '';
+
+                const lowStockClass = quantity <= 2 ? '' : 'display: none;';
+
+                const imageHtml = imagePath 
+                    ? `<img src="${imagePath}" class="wine-pic" alt="${wineName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                    : '';
+                const fallbackHtml = `<div class="wine-pic" style="${imagePath ? 'display:none;' : 'display:flex;'}">🍷</div>`;
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="img-cell-wrapper">
+                            ${imageHtml}
+                            ${fallbackHtml}
+                        </div>
+                    </td>
+                    <td><strong>${winery}</strong></td>
+                    <td>${wineName}</td>
+                    <td>${vintage}</td>
+                    <td>${type}</td>
+                    <td>
+                        <div class="qty-controls">
+                            <button class="btn-qty btn-minus">−</button>
+                            <span class="qty-val">${quantity}</span>
+                            <button class="btn-qty btn-plus">+</button>
+                            <span class="low-stock" style="${lowStockClass}">Low</span>
+                        </div>
+                    </td>
+                    <td><code>${binLocation}</code></td>
+                `;
+
+                const qtyValEl = tr.querySelector('.qty-val');
+                const lowStockEl = tr.querySelector('.low-stock');
+
+                tr.querySelector('.btn-minus').addEventListener('click', () => {
+                    if (quantity > 0) {
+                        quantity--;
+                        qtyValEl.textContent = quantity;
+                        lowStockEl.style.display = quantity <= 2 ? 'inline' : 'none';
+                    }
+                });
+
+                tr.querySelector('.btn-plus').addEventListener('click', () => {
+                    quantity++;
+                    qtyValEl.textContent = quantity;
+                    lowStockEl.style.display = quantity <= 2 ? 'inline' : 'none';
+                });
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+        searchBox.addEventListener('input', function(e) {
+            const searchFilter = e.target.value.toLowerCase();
+            const tableRows = tableBody.getElementsByTagName('tr');
+            
+            for (let row of tableRows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchFilter) ? '' : 'none';
+            }
+        });
+
+        loadInventory();
+    </script>
+</body>
+</html>

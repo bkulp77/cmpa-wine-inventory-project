@@ -227,11 +227,15 @@ footer p:hover {
         padding: var(--spacing-medium);
     }
     header {
-        flex-direction: row;
+        flex-direction: column;
         gap: var(--spacing-small);
     }
     .project-image {
         max-width: 100%;
+    }
+    .container {
+        with: 100%;
+        overflow-x: auto;
     }
 }
 @media (width >= 480px) {

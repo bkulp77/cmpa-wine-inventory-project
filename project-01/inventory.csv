@@ -1,7 +1,7 @@
 Winery,Wine Name,Vintage,Type,Quantity,Bin Location,Image,Website,Website
-Cresson Bluff,Tempranillo,2019,Red,1,Shelf A1,,,
-Cresson Bluff,Noble,,Red,1,Shelf A4,,,
-Cresson Bluff,rendevous Red,2021,Red,1,Shelf A5,,,
+Cresson Bluff,Tempranillo,2019,Red,1,Shelf A1,images/cresson-bluff-tempranillo.jpg,,
+Cresson Bluff,Noble,,Red,1,Shelf A4,/images/cresson-bluff-noble.jpg,,
+Cresson Bluff,rendevous Red,2021,Red,1,Shelf A5,/images/cresson-bluff-rendevous-red.jpg,,
 Lost Oak Winery,Red Blend,2023,Red,2,Shelf A4,,,
 Alexandria Nichole,Savignon Blanc,2023,White,1,Fridge B3,images/anc-sauv.jpg,,
 Alexandria Nichole,Rock Star Red,2022,Red,2,Shelf E7-8,images/rock-star-red.jpg,www.alexandrianicole.com,

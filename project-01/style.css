@@ -40,6 +40,9 @@ header {
     text-align: center;
     align-items: center;
     flex-direction: column;
+    box-sizing: border-box;
+    with: 100%;
+    overflow:hidden;
 }
 
 header h1 {

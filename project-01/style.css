@@ -41,7 +41,7 @@ header {
     align-items: center;
     flex-direction: column;
     box-sizing: border-box;
-    with: 100%;
+    width: 100%;
     overflow:hidden;
 }
 
@@ -171,7 +171,7 @@ table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 
 
 .project-card {
     flex: 1 1 calc(33.333% - var(--spacing-medium));
-    min width: 50%
+    min width: 50%;
     background-color: #fff;
     color: var(--text-color);
     padding: var(--spacing-large);
@@ -247,15 +247,15 @@ footer p:hover {
         max-width: 100%;
     }
     .container {
-        with: 100%;
+        width: 100%;
         overflow-x: auto;
     }
 }
 @media (width >= 480px) {
     .project-card {
-        flex basis: 45%}
+        flex-basis: 45%}
 }
 @media (width >= 1024px) {
     .project-card {
-        flex basis: 30%}
+        flex-basis: 30%}
 }

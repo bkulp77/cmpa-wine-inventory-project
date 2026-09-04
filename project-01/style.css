@@ -88,21 +88,22 @@ table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer;
         }
-        .wine-pic:hover {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Centers the image perfectly on screen */
-            width: auto;
-            height: 50vh; /* Automatically scales to exactly half your screen height (a quarter of screen area) */
-            max-width: 90vw;
-            object-fit: contain; /* Prevents stretching or warping the wine label aspect ratio */
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 100vw rgba(0,0,0,0.25); /* Adds a heavy drop shadow and a soft dim backdrop */
-            border-radius: 12px;
-            z-index: 9999; /* Forces the image past all headers, layout blocks, and text strings */
-            border: 4px solid #fff;
-            cursor: zoom-out;
-        }
+        .img-cell-wrapper:hover .wine-pic {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: 50vh;
+    max-width: 90vw;
+    object-fit: contain;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 100vw rgba(0,0,0,0.25);
+    border-radius: 12px;
+    z-index: 9999;
+    border: 4px solid #fff;
+    cursor: zoom-out;
+    pointer-events: none; /* Prevents the enlarged popup from blocking mouse movement */
+}
         .img-cell-wrapper {
     width: 50px;
     height: 50px;

@@ -1,8 +1,8 @@
 :root {
-    --primary-color: #7bb184;
+    --primary-color: rgb(169, 209, 169);
     --primary-hover-color: #ed07bb;
-    --text-color: #430fe1;
-    --background-color: #a4e6ef;
+    --text-color: #604aa4;
+    --background-color: #c89393;
     --accent-color: #f31f07;
 
     --font-main: 'Helvetica Neue', Arial, sans-serif;

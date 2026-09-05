@@ -33,6 +33,7 @@
                 <tr>
                     <th>Bottle</th>
                     <th>Winery</th>
+                    <th>State</th>
                     <th>Wine Name</th>
                     <th>Vintage</th>
                     <th>Type</th>
@@ -76,13 +77,14 @@
                 const tr = document.createElement('tr');
                 
                 const winery = row[0];
-                const wineName = row[1];
-                const vintage = row[2];
-                const type = row[3];
-                let quantity = parseInt(row[4]) || 0;
-                const binLocation = row[5] || 'N/A';
-                const imagePath = row[6] ? row[6].trim() : '';
-                const website = row[7] || 'N/A'
+                const state = row[1];
+                const wineName = row[2];
+                const vintage = row[3];
+                const type = row[4];
+                let quantity = parseInt(row[5]) || 0;
+                const binLocation = row[6] || 'N/A';
+                const imagePath = row[7] ? row[7].trim() : '';
+                const website = row[8] || 'N/A'
 
                 const lowStockClass = quantity <= 1 ? '' : 'display: none;';
 
@@ -99,6 +101,7 @@
                         </div>
                     </td>
                     <td><strong>${winery}</strong></td>
+                    <td>${state}</td>
                     <td>${wineName}</td>
                     <td>${vintage}</td>
                     <td>${type}</td>
@@ -111,6 +114,7 @@
                         </div>
                      </td>
                     <td><code>${binLocation}</code></td>
+                    <td><code>${website}</code></td></td>
                 `;
 
                 const qtyValEl = tr.querySelector('.qty-val');

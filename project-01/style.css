@@ -259,3 +259,15 @@ footer p:hover {
     .project-card {
         flex-basis: 30%}
 }
+ .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        /* Prevents the layout from shifting when numbers change from 1 to 2 digits */
+        .qty-val {
+            display: inline-block;
+            min-width: 24px;
+            text-align: center;
+            font-weight: bold;
+        }

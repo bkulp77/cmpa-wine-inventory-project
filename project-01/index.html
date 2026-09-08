@@ -63,6 +63,23 @@
                     .filter(row => row.length > 1 && row !== '');
                 
                 rows.shift(); // Remove header titles
+                  rows.sort((rowA, rowB) => {
+            // Compare Winery Names (Index 0)
+            const wineryA = (rowA[0] || '').trim().toLowerCase();
+            const wineryB = (rowB[0] || '').trim().toLowerCase();
+            
+            if (wineryA < wineryB) return -1;
+            if (wineryA > wineryB) return 1;
+            
+            // If Wineries are identical, compare Wine Names (Index 2)
+            const wineA = (rowA[2] || '').trim().toLowerCase();
+            const wineB = (rowB[2] || '').trim().toLowerCase();
+            
+            if (wineA < wineB) return -1;
+            if (wineA > wineB) return 1;
+            
+            return 0;
+        });
                 
                 renderTable(rows);
             } catch (error) {

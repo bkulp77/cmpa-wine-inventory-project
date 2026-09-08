@@ -20,6 +20,58 @@
             </ul>
         </nav>
     </header>
+    <div class="container" style="margin-bottom: var(--spacing-large);">
+    <h2>Add New Wine to Inventory</h2>
+    <form id="wine-form" class="wine-input-form">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="f-winery">Winery</label>
+                <input type="text" id="f-winery" required placeholder="e.g., Duckhorn">
+            </div>
+            <div class="form-group">
+                <label for="f-state">State</label>
+                <input type="text" id="f-state" required placeholder="e.g., California">
+            </div>
+            <div class="form-group">
+                <label for="f-wine-name">Wine Name</label>
+                <input type="text" id="f-wine-name" required placeholder="e.g., Merlot">
+            </div>
+            <div class="form-group">
+                <label for="f-vintage">Vintage</label>
+                <input type="number" id="f-vintage" required placeholder="e.g., 2021">
+            </div>
+            <div class="form-group">
+                <label for="f-type">Wine Type</label>
+                <input type="text" id="f-type" required placeholder="e.g., Red">
+            </div>
+            <div class="form-group">
+                <label for="f-qty">Quantity</label>
+                <input type="number" id="f-qty" min="0" required value="1">
+            </div>
+            <div class="form-group">
+                <label for="f-bin">Bin Location</label>
+                <input type="text" id="f-bin" placeholder="e.g., Fridge Shelf 2">
+            </div>
+           <div class="form-group">
+    <label for="f-front-img">Front Image (Upload/Camera)</label>
+    <!-- accept="image/*" triggers phone camera options natively -->
+    <input type="file" id="f-front-img" accept="image/*">
+</div>
+<div class="form-group">
+    <label for="f-website">Winery Website</label>
+    <input type="text" id="f-website" placeholder="e.g., duckhorn.com">
+</div>
+<div class="form-group">
+    <label for="f-back-img">Back Image (Upload/Camera)</label>
+    <input type="file" id="f-back-img" accept="image/*">
+</div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Add Row to View</button>
+            <button type="button" id="btn-download" class="btn-secondary">Download Updated CSV</button>
+        </div>
+    </form>
+</div>      
     <div class="container">
         <h1>My Wine Inventory</h1>
         <div class="notice-banner">

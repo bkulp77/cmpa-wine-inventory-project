@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wine Inventory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>My Wine Inventory</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Wine Inventory</a></li>
+                <li><a href="washington-wines/index.html">Washington State Wines</a></li>
+                <li><a href="texas-wines/index.html">Texas Wines</a></li>
+                <li><a href="california-wines/index.html">California Wines</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+    
+      
+</div>      
+    <div class="container">
+        <h1>My Wine Inventory</h1>
+        <div class="notice-banner">
+            <strong>Note:</strong>Pressing<strong>+</strong> or <strong>-</strong>tracks consumption in the browser, adjust csv in vs code to make a permanent change.
+        </div>
+        <div class="controls">
+            <input type="text" id="search-box" placeholder="search by winery, grape type, location...">
+        </div>
+        <table id="inventory-table">
+            <thead>
+                <tr>
+                    <th>Bottle</th>
+                    <th>Winery</th>
+                    <th>State</th>
+                    <th>Wine Name</th>
+                    <th>Vintage</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Bin Location</th>
+                    <th>Website</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td colspan="8">loaing inventory file...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        const tableBody = document.getElementById('table-body');
+        const searchBox = document.getElementById('search-box');
+
+        async function loadInventory() {
+            try {
+                const response = await fetch('inventory.csv');
+                if (!response.ok) throw new Error('Could not find inventory.csv');
+                
+                const csvText = await response.text();
+                
+                const rows = csvText.trim().split('\n')
+                    .map(row => row.split(','))
+                    .filter(row => row.length > 1 && row !== '');
+                
+                rows.shift(); // Remove header titles
+                  rows.sort((rowA, rowB) => {
+            // Compare Winery Names (Index 0)
+            const wineryA = (rowA[0] || '').trim().toLowerCase();
+            const wineryB = (rowB[0] || '').trim().toLowerCase();
+            
+            if (wineryA < wineryB) return -1;
+            if (wineryA > wineryB) return 1;
+            
+            // If Wineries are identical, compare Wine Names (Index 2)
+            const wineA = (rowA[2] || '').trim().toLowerCase();
+            const wineB = (rowB[2] || '').trim().toLowerCase();
+            
+            if (wineA < wineB) return -1;
+            if (wineA > wineB) return 1;
+            
+            return 0;
+        });
+                
+                renderTable(rows);
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="color:red; font-weight:bold;">Error: ${error.message}. Make sure inventory.csv is in the same folder.</td></tr>`;
+            }
+        }
+
+        function renderTable(rows) {
+            tableBody.innerHTML = '';
+            
+            rows.forEach((row) => {
+                const tr = document.createElement('tr');
+                
+                const winery = row[0];
+                const state = row[1];
+                const wineName = row[2];
+                const vintage = row[3];
+                const type = row[4];
+                let quantity = parseInt(row[5]) || 0;
+                const binLocation = row[6] || 'N/A';
+                const imagePath = row[7] ? row[7].trim() : '';
+                const website = row[8] || 'N/A'
+
+                const lowStockClass = quantity <= 1 ? '' : 'display: none;';
+
+                const imageHtml = imagePath 
+                    ? `<img src="${imagePath}" class="wine-pic" alt="${wineName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                    : '';
+                const fallbackHtml = `<div class="wine-pic" style="${imagePath ? 'display:none;' : 'display:flex;'}">🍷</div>`;
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="img-cell-wrapper">
+                            ${imageHtml}
+                            ${fallbackHtml}
+                        </div>
+                    </td>
+                    <td><strong>${winery}</strong></td>
+                    <td>${state}</td>
+                    <td>${wineName}</td>
+                    <td>${vintage}</td>
+                    <td>${type}</td>
+                    <td>
+                        <div class="qty-controls">
+                            <button class="btn-qty btn-minus">−</button>
+                            <span class="qty-val">${quantity}</span>
+                            <button class="btn-qty btn-plus">+</button>
+                            <span class="low-stock" style="${lowStockClass}">Low</span>
+                        </div>
+                     </td>
+                    <td><code>${binLocation}</code></td>
+                    <td><a href="https://${website}" target="_blank"><code>${website}</code></a></td>
+                `;
+
+                const qtyValEl = tr.querySelector('.qty-val');
+                const lowStockEl = tr.querySelector('.low-stock');
+
+                tr.querySelector('.btn-minus').addEventListener('click', () => {
+                    if (quantity > 0) {
+                        quantity--;
+                        qtyValEl.textContent = quantity;
+                        lowStockEl.style.display = quantity <= 1 ? 'inline' : 'none';
+                    }
+                });
+
+                tr.querySelector('.btn-plus').addEventListener('click', () => {
+                    quantity++;
+                    qtyValEl.textContent = quantity;
+                    lowStockEl.style.display = quantity <= 1 ? 'inline' : 'none';
+                });
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+        searchBox.addEventListener('input', function(e) {
+            const searchFilter = e.target.value.toLowerCase();
+            const tableRows = tableBody.getElementsByTagName('tr');
+            
+            for (let row of tableRows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchFilter) ? '' : 'none';
+            }
+        });
+
+        loadInventory();
+    </script>
+    <H2>Wine Locations</H2>
+    <H3>Wine Shelf</H3>
+    <div class="image-container">
+              <img src="images/wine-shelf.jpg" class="project-image" alt="Wine Shelf">
+              </div>
+    <H3>Wine Rack</H3>
+    <div class="image-container">
+              <img src="images/wine-rack.jpg" class="project-image" alt="Wine Rack">
+              </div>
+    <H3>Wine Fridge</H3>
+    <div class="image-container">
+              <img src="images/wine-fridge.jpg" class="project-image" alt="Wine Fridge">
+              </div>

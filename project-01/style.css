@@ -270,4 +270,9 @@ footer p:hover {
             min-width: 24px;
             text-align: center;
             font-weight: bold;
-        }
+        }table, .inventory-container {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* Makes scrolling feel smooth on iOS */
+}

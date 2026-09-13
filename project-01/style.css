@@ -73,7 +73,7 @@ nav a:hover {
 table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 6px; overflow: hidden; }
         th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
         th { background-color: #58111A; color: white; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
-        tr:hover { background-color: #467c52; }
+        tr:hover { background-color: #d0a9d0; }
 .wine-pic { 
             width: 50px; 
             height: 50px; 

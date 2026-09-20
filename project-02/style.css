@@ -95,11 +95,11 @@ nav a:hover {
 }
 .controls { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
         #search-box { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; }
-.notice-banner { background-color: #e7ece9; color: #92400e; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; border: 1px solid #32a341; }
+.notice-banner { background-color: #e7ece9; color: #92400e; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; border: 1px solid #dfc9c9; }
 table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 6px; overflow: hidden; }
         th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
         th { background-color: #58111A; color: white; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
-        tr:hover { background-color: #467c52; }
+        tr:hover { background-color: #beaab2; }
 .wine-pic { 
             width: 50px; 
             height: 50px; 

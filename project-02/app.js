@@ -153,7 +153,7 @@ setInterval(() => {
   }
 }, 5000);
 document.getElementById('wine-data-entry').addEventListener('submit', async function(e) {
-  e.preventDefault(); 
+  e.preventDefault();
   
   const submitButton = e.target.querySelector('button[type="submit"]');
   submitButton.disabled = true;
@@ -166,9 +166,9 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
     try {
       imageBase64String = await new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result); // Base64 encoding result link
+        reader.onload = () => resolve(reader.result); 
         reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(imageFileInput.files[0]); // Starts conversion stream
+        reader.readAsDataURL(imageFileInput.files[0]);
       });
     } catch (fileErr) {
       console.error("File processing failure:", fileErr);
@@ -176,7 +176,17 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
     }
   }
 
- 
+  const newWine = {
+    winery: document.getElementById('form-winery').value.trim(),
+    wine_name: document.getElementById('form-name').value.trim(),
+    state: document.getElementById('form-state').value.trim() || 'N/A',
+    vintage: document.getElementById('form-vintage').value.trim() || 'N/A',
+    type: document.getElementById('form-type').value,
+    quantity: parseInt(document.getElementById('form-qty').value) || 0,
+    bin_location: document.getElementById('form-bin').value.trim().toUpperCase() || 'N/A',
+    image: imageBase64String,
+    website: 'N/A'
+  };
 
   try {
     const { data, error } = await supabase
@@ -188,9 +198,9 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
     alert(`Success! "${newWine.wine_name}" has been permanently added with its photo.`);
     
     e.target.reset();
-    document.getElementById('form-qty').value = "1"; 
+    document.getElementById('form-qty').value = "1";
     
-    await loadInventory(); 
+    await loadInventory();
   } catch (err) {
     console.error("Submission Error:", err);
     alert("Database Connection Failed: " + (err.message || "Unknown error"));

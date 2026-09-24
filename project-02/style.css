@@ -57,7 +57,12 @@ h2 {
     color: var(--accent-color);
     text-align: center;
 }
-
+h3 {
+    font-size: var(--font-size-large);
+    margin-bottom: var(--spacing-medium);
+    color: var(--accent-color);
+    text-align: center;
+}
 header {
     background-color: var(--primary-color);
     color: #fff;
@@ -215,6 +220,7 @@ table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 
 .project-card h3 {
     margin-top: 0;
     color: var(--accent-color);
+    text-align: center;
 }
 
 .project-card p {

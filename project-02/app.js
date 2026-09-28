@@ -138,7 +138,16 @@ searchBox.addEventListener('input', function(e) {
     const wineName = String(row.wine_name || '').toLowerCase();
     const binLocation = String(row.bin_location || '').toLowerCase();
     const type = String(row.type || '').toLowerCase();
-    return winery.includes(searchFilter) || wineName.includes(searchFilter) || type.includes(searchFilter) || binLocation.includes(searchFilter);
+    // Added fields:
+    const state = String(row.state || '').toLowerCase();
+    const vintage = String(row.vintage || '').toLowerCase();
+    
+    return winery.includes(searchFilter) || 
+           wineName.includes(searchFilter) || 
+           type.includes(searchFilter) || 
+           binLocation.includes(searchFilter) ||
+           state.includes(searchFilter) ||
+           vintage.includes(searchFilter);
   });
   renderTable(filteredRows);
 });

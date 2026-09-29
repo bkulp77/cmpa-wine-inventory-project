@@ -56,12 +56,15 @@ if (data && data.length > 0) {
 function renderTable(rows) {
   tableBody.innerHTML = '';
   if (!rows || rows.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px; color:#666;">Your database table is connected but empty.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:20px; color:#666;">Your database table is connected but empty.</td></tr>`;
     return;
   }
+  
   rows.forEach((row) => {
     try {
       const tr = document.createElement('tr');
+      tr.setAttribute('data-id', row.id); // Tag the row so we can find it instantly on save
+      
       const id = row.id;
       const winery = row.winery || 'N/A';
       const state = row.state || 'N/A';
@@ -72,15 +75,17 @@ function renderTable(rows) {
       const binLocation = row.bin_location || 'N/A';
       const imagePath = row.image ? String(row.image).trim() : '';
       const website = row.website || 'N/A';
+      
+      const currentNotes = row.tasting_notes ? String(row.tasting_notes).trim() : '';
       const lowStockClass = quantity <= 1 ? '' : 'display: none;';
       const imageHtml = imagePath ? `<img src="${imagePath}" class="wine-pic" alt="${wineName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : '';
       const fallbackHtml = `<div class="wine-pic" style="${imagePath ? 'display:none;' : 'display:flex;'}">🍷</div>`;
-      
+
       tr.innerHTML = `
         <td><div class="img-cell-wrapper">${imageHtml}${fallbackHtml}</div></td>
         <td><strong>${winery}</strong></td>
         <td>${state}</td>
-        <td>${wineName}</td>
+        <td><strong>${wineName}</strong></td>
         <td>${vintage}</td>
         <td>${type}</td>
         <td>
@@ -93,7 +98,26 @@ function renderTable(rows) {
         </td>
         <td><code>${binLocation}</code></td>
         <td><a href="https://${website}" target="_blank"><code>${website}</code></a></td>
+        <td>
+          <!-- 💡 PLACED TOGETHER: The button and the notes text are stacked vertically in the same cell -->
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <button class="open-notes-modal-btn" style="background:#58111A; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold; white-space:nowrap;">
+              ${currentNotes !== "" ? '📝 View Notes' : '➕ Log Notes'}
+            </button>
+            <div class="notes-text-block" style="font-size: 11px; color: #58111A; font-style: italic; white-space: normal; max-width: 150px; text-align: center;">
+              ${currentNotes ? `💬 \${currentNotes}` : ''}
+            </div>
+          </div>
+        </td>
       `;
+
+      tr.querySelector('.open-notes-modal-btn').addEventListener('click', () => {
+        document.getElementById('modal-wine-id').value = id;
+        document.getElementById('modal-wine-title').textContent = `Tasting Notes: ${winery} - ${wineName}`;
+        document.getElementById('modal-notes-textarea').value = row.tasting_notes || '';
+        document.getElementById('modal-status-msg').textContent = "";
+        document.getElementById('notes-modal').style.display = 'flex';
+      });
 
       const qtyValEl = tr.querySelector('.qty-val');
       const lowStockEl = tr.querySelector('.low-stock');
@@ -102,26 +126,14 @@ function renderTable(rows) {
         if (quantity > 0) {
           quantity--;
           const { error } = await supabase.from('inventory.csv').update({ id: id, quantity: quantity });
-          if (!error) {
-            row.quantity = quantity;
-            qtyValEl.textContent = quantity;
-            lowStockEl.style.display = quantity <= 1 ? 'inline' : 'none';
-          } else {
-            alert("Failed to update: " + error.message);
-          }
+          if (!error) { row.quantity = quantity; qtyValEl.textContent = quantity; lowStockEl.style.display = quantity <= 1 ? 'inline' : 'none'; }
         }
       });
 
       tr.querySelector('.btn-plus').addEventListener('click', async () => {
         quantity++;
         const { error } = await supabase.from('inventory.csv').update({ id: id, quantity: quantity });
-        if (!error) {
-          row.quantity = quantity;
-          qtyValEl.textContent = quantity;
-          lowStockEl.style.display = quantity <= 1 ? 'inline' : 'none';
-        } else {
-          alert("Failed to update: " + error.message);
-        }
+        if (!error) { row.quantity = quantity; qtyValEl.textContent = quantity; lowStockEl.style.display = quantity <= 1 ? 'inline' : 'none'; }
       });
 
       tableBody.appendChild(tr);
@@ -130,6 +142,55 @@ function renderTable(rows) {
     }
   });
 }
+
+document.getElementById('close-modal-btn').addEventListener('click', () => {
+  document.getElementById('notes-modal').style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+  const modalOverlay = document.getElementById('notes-modal');
+  if (e.target === modalOverlay) {
+    modalOverlay.style.display = 'none';
+  }
+});
+
+document.getElementById('save-modal-notes-btn').addEventListener('click', async () => {
+  const wineId = document.getElementById('modal-wine-id').value;
+  const notesText = document.getElementById('modal-notes-textarea').value.trim();
+  const statusMsg = document.getElementById('modal-status-msg');
+  
+  statusMsg.style.color = "orange";
+  statusMsg.textContent = "Saving...";
+
+  const { error } = await supabase
+    .from('inventory.csv')
+    .update({ id: wineId, tasting_notes: notesText });
+
+  if (!error) {
+    statusMsg.style.color = "green";
+    statusMsg.textContent = "Saved successfully! ✓";
+    
+    const localMatch = inventoryData.find(item => String(item.id) === String(wineId));
+    if (localMatch) { localMatch.tasting_notes = notesText; }
+
+  
+    const targetRow = document.querySelector(`tr[data-id="${wineId}"]`);
+    if (targetRow) {
+      const notesBlock = targetRow.querySelector('.notes-text-block');
+      const actionBtn = targetRow.querySelector('.open-notes-modal-btn');
+      
+      if (notesBlock) { notesBlock.innerHTML = notesText ? `💬 ${notesText}` : ''; }
+      if (actionBtn) { actionBtn.textContent = notesText ? '📝 View Notes' : '➕ Log Notes'; }
+    }
+    
+    setTimeout(() => { document.getElementById('notes-modal').style.display = 'none'; }, 800);
+  } else {
+    statusMsg.textContent = "";
+    alert("Failed to save tasting updates: " + error.message);
+  }
+});
+
+
 
 searchBox.addEventListener('input', function(e) {
   const searchFilter = e.target.value.toLowerCase();
@@ -218,3 +279,28 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
     submitButton.textContent = "Save Wine to Shared Inventory";
   }
 });
+setInterval(() => {
+  const searchInput = document.getElementById('search-box');
+  const isModalOpen = document.getElementById('notes-modal').style.display === 'flex';
+  
+  // Only refresh if search is empty AND you aren't currently writing notes in the modal pop-up
+  if ((!searchInput || searchInput.value === '') && !isModalOpen) {
+    console.log("Auto-refreshing inventory safely from Supabase...");
+    loadInventory();
+  }
+}, 5000);
+if (!error) {
+  statusMsg.style.color = "green";
+  statusMsg.textContent = "Saved successfully! ✓";
+  
+  const localMatch = inventoryData.find(item => String(item.id) === String(wineId));
+  if (localMatch) {
+    localMatch.tasting_notes = notesText;
+  }
+
+  renderTable(inventoryData);
+  
+  setTimeout(() => {
+    document.getElementById('notes-modal').style.display = 'none';
+  }, 800);
+}

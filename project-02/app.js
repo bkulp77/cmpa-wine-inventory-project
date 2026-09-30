@@ -54,6 +54,7 @@ if (data && data.length > 0) {
 }
 
 function renderTable(rows) {
+  updateSummaryDashboard(rows); 
   tableBody.innerHTML = '';
   if (!rows || rows.length === 0) {
     tableBody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:20px; color:#666;">Your database table is connected but empty.</td></tr>`;
@@ -331,4 +332,60 @@ if (!error) {
   setTimeout(() => {
     document.getElementById('notes-modal').style.display = 'none';
   }, 800);
+}
+function updateSummaryDashboard(rows) {
+  const dashboard = document.getElementById('inventory-summary-dashboard');
+  if (!dashboard) return;
+
+  let totalRed = 0;
+  let totalWhite = 0;
+  let totalRose = 0;
+  const wineryTotals = {};
+
+  // Accumulate calculations across active items
+  rows.forEach(row => {
+    const qty = parseInt(row.quantity) || 0;
+    const type = String(row.type || '').trim().toLowerCase();
+    const winery = String(row.winery || 'Unknown Winery').trim();
+
+    // 1. Calculate Wine Type totals
+    if (type.includes('red')) totalRed += qty;
+    else if (type.includes('white')) totalWhite += qty;
+    else if (type.includes('ros')) totalRose += qty; // Handles rose and rosé variations
+
+    // 2. Calculate Winery totals
+    if (qty > 0) {
+      wineryTotals[winery] = (wineryTotals[winery] || 0) + qty;
+    }
+  });
+
+  // Build the Winery badge elements string
+  const wineryBadgesHtml = Object.keys(wineryTotals)
+    .sort()
+    .map(winery => `<span class="winery-badge">${winery}: <strong>${wineryTotals[winery]}</strong> btl${wineryTotals[winery] !== 1 ? 's' : ''}</span>`)
+    .join('');
+
+  // Inject structural template markup into dashboard container
+  dashboard.innerHTML = `
+    <div class="summary-row">
+      <div class="summary-card type-red">
+        <h4>Red Wines</h4>
+        <div class="summary-count">${totalRed}</div>
+      </div>
+      <div class="summary-card type-white">
+        <h4>White Wines</h4>
+        <div class="summary-count">${totalWhite}</div>
+      </div>
+      <div class="summary-card type-rose">
+        <h4>Rosé Wines</h4>
+        <div class="summary-count">${totalRose}</div>
+      </div>
+    </div>
+    <div class="winery-summary-list">
+      <h4>Winery Inventory Allocation</h4>
+      <div class="winery-badges">
+        ${wineryBadgesHtml || '<span style="color:#999; font-style:italic;">No active winery stock available.</span>'}
+      </div>
+    </div>
+  `;
 }

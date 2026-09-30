@@ -345,3 +345,76 @@ footer p:hover {
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+/* --- Summary Dashboard Styles --- */
+.summary-dashboard {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: var(--font-main, sans-serif);
+}
+
+.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: space-around;
+}
+
+.summary-card {
+  flex: 1;
+  min-width: 140px;
+  background: #fbf8f9;
+  border-left: 5px solid #58111A;
+  padding: 12px 15px;
+  border-radius: 4px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.summary-card.type-white { border-left-color: #f4ebd0; }
+.summary-card.type-rose { border-left-color: #ffb7b2; }
+
+.summary-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #666;
+  letter-spacing: 0.5px;
+}
+
+.summary-card .summary-count {
+  font-size: 24px;
+  font-weight: bold;
+  color: #58111A;
+}
+
+.winery-summary-list {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.winery-summary-list h4 {
+  margin: 0 0 10px 0;
+  color: #060c08;
+  font-size: 14px;
+}
+
+.winery-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.winery-badge {
+  background: #e7ece9;
+  color: #58111A;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: bold;
+}

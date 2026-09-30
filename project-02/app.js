@@ -21,10 +21,18 @@ async function loadInventory() {
   try {
     console.log("Attempting secure connection to Supabase...");
     
+    // 1. Generate a unique timestamp to completely bypass the browser's cache layout
+    const cacheBuster = new Date().getTime();
+    
+    // 2. Build the query with explicit cache-busting headers
     const { data, error } = await supabase
       .from('inventory.csv')
       .select('*', { 
-        headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' } 
+        headers: { 
+          'pragma': 'no-cache', 
+          'cache-control': 'no-cache',
+          'x-cache-bypass': cacheBuster.toString() // Forces a fresh fetch from the server
+        } 
       });
 
     if (error) {
@@ -32,10 +40,10 @@ async function loadInventory() {
       throw new Error(`[${error.code || 'API Error'}] ${error.message}`);
     }
 
-if (data && data.length > 0) { 
-  inventoryData = JSON.parse(JSON.stringify(data)).filter(row => {
-    return (parseInt(row.quantity) || 0) > 0;
-  }); 
+    if (data && data.length > 0) { 
+      inventoryData = JSON.parse(JSON.stringify(data)).filter(row => {
+        return (parseInt(row.quantity) || 0) > 0;
+      }); 
       
       inventoryData.sort((rowA, rowB) => {
         const wineryA = String(rowA.winery || '').trim().toLowerCase();
@@ -60,6 +68,7 @@ if (data && data.length > 0) {
     tableBody.innerHTML = `<tr><td colspan="9" style="color:red; font-weight:bold; padding: 20px; background: #fff1f1;">⚠️ Connection Failed:<br><small>${error.message}</small></td></tr>`;
   }
 }
+
 
 function renderTable(rows) {
   updateSummaryDashboard(rows); 

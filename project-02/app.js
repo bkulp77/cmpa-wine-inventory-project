@@ -331,14 +331,6 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
   }
 });
 
-// Listen for instant database changes on row edits, additions, and updates
-supabase
-  .channel('inventory-changes')
-  .on('postgres_changes', { event: '*', scheme: 'public', table: 'inventory.csv' }, (payload) => {
-     console.log('Database updated in real-time!', payload);
-     loadInventory(); // Instantly refreshes the view when something changes
-  })
-  .subscribe();
 
 if (!error) {
   statusMsg.style.color = "green";

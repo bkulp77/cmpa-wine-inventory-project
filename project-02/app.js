@@ -25,7 +25,7 @@ async function loadInventory() {
     
     // 2. Pass a valid "not equal" filter on the ID column to bypass the browser cache safely
     const { data, error } = await supabase
-      .from(`inventory.csv?id=neq.${cacheBuster}`)
+      .from(`inventory.csv?id=not.eq.${cacheBuster}`)
       .select('');
 
 

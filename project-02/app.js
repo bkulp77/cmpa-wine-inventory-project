@@ -245,31 +245,60 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
     }
   }
 
-  const newWine = {
-    winery: document.getElementById('form-winery').value.trim(),
-    wine_name: document.getElementById('form-name').value.trim(),
-    state: document.getElementById('form-state').value.trim() || 'N/A',
-    vintage: document.getElementById('form-vintage').value.trim() || 'N/A',
-    type: document.getElementById('form-type').value,
-    quantity: parseInt(document.getElementById('form-qty').value) || 0,
-    bin_location: document.getElementById('form-bin').value.trim().toUpperCase() || 'N/A',
-    image: imageBase64String,
-    website: 'N/A'
-  };
+  // Capture the form inputs
+  const wineryInput = document.getElementById('form-winery').value.trim();
+  const nameInput = document.getElementById('form-name').value.trim();
+  const vintageInput = document.getElementById('form-vintage').value.trim() || 'N/A';
+  const additionalQty = parseInt(document.getElementById('form-qty').value) || 0;
+
+  // 1. SMART CHECK: Look through your existing inventory array for a perfect match
+  const duplicateMatch = inventoryData.find(item => {
+    return String(item.winery).trim().toLowerCase() === wineryInput.toLowerCase() &&
+           String(item.wine_name).trim().toLowerCase() === nameInput.toLowerCase() &&
+           String(item.vintage).trim().toLowerCase() === vintageInput.toLowerCase();
+  });
 
   try {
-    const { data, error } = await supabase
-      .from('inventory.csv')
-      .insert(newWine);
+    if (duplicateMatch) {
+      // 2. IF MATCH FOUND: Update the existing row's quantity in Supabase
+      const newTotalQuantity = (parseInt(duplicateMatch.quantity) || 0) + additionalQty;
+      
+      const { error } = await supabase
+        .from('inventory.csv')
+        .update({ id: duplicateMatch.id, quantity: newTotalQuantity });
 
-    if (error) throw error;
+      if (error) throw error;
+      alert(`Updated existing inventory! Added ${additionalQty} bottle(s) to "${wineryInput} - ${nameInput} (${vintageInput})".`);
+      
+    } else {
+      // 3. IF NO MATCH FOUND: Carry out a standard fresh insert
+      const newWine = {
+        winery: wineryInput,
+        wine_name: nameInput,
+        state: document.getElementById('form-state').value.trim() || 'N/A',
+        vintage: vintageInput,
+        type: document.getElementById('form-type').value,
+        quantity: additionalQty,
+        bin_location: document.getElementById('form-bin').value.trim().toUpperCase() || 'N/A',
+        image: imageBase64String,
+        website: 'N/A'
+      };
 
-    alert(`Success! "${newWine.wine_name}" has been permanently added with its photo.`);
-    
+      const { error } = await supabase
+        .from('inventory.csv')
+        .insert(newWine);
+
+      if (error) throw error;
+      alert(`Success! "${newWine.wine_name}" has been permanently added with its photo.`);
+    }
+
+    // Reset form elements cleanly
     e.target.reset();
     document.getElementById('form-qty').value = "1";
     
+    // Reload your synchronized UI
     await loadInventory();
+    
   } catch (err) {
     console.error("Submission Error:", err);
     alert("Database Connection Failed: " + (err.message || "Unknown error"));
@@ -278,6 +307,7 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
     submitButton.textContent = "Save Wine to Shared Inventory";
   }
 });
+
 setInterval(() => {
   const searchInput = document.getElementById('search-box');
   const isModalOpen = document.getElementById('notes-modal').style.display === 'flex';

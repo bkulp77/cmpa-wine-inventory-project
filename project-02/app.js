@@ -20,20 +20,15 @@ let inventoryData = [];
 async function loadInventory() {
   try {
     console.log("Attempting secure connection to Supabase...");
-    
-    // 1. Generate a unique timestamp to completely bypass the browser's cache layout
+      // 1. Create a unique number based on the exact millisecond time
     const cacheBuster = new Date().getTime();
     
-    // 2. Build the query with explicit cache-busting headers
+    // 2. Pass a valid "not equal" filter on the ID column to bypass the browser cache safely
     const { data, error } = await supabase
-      .from('inventory.csv')
-      .select('*', { 
-        headers: { 
-          'pragma': 'no-cache', 
-          'cache-control': 'no-cache',
-          'x-cache-bypass': cacheBuster.toString() // Forces a fresh fetch from the server
-        } 
-      });
+      .from(`inventory.csv?id=neq.${cacheBuster}`)
+      .select('');
+
+
 
     if (error) {
       console.error("Supabase Error Details:", error);

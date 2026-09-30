@@ -99,13 +99,12 @@ function renderTable(rows) {
         <td><code>${binLocation}</code></td>
         <td><a href="https://${website}" target="_blank"><code>${website}</code></a></td>
         <td>
-          <!-- 💡 PLACED TOGETHER: The button and the notes text are stacked vertically in the same cell -->
           <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
             <button class="open-notes-modal-btn" style="background:#58111A; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold; white-space:nowrap;">
               ${currentNotes !== "" ? '📝 View Notes' : '➕ Log Notes'}
             </button>
             <div class="notes-text-block" style="font-size: 11px; color: #58111A; font-style: italic; white-space: normal; max-width: 150px; text-align: center;">
-              ${currentNotes ? `💬 \${currentNotes}` : ''}
+              ${currentNotes ? ` ` : ''}
             </div>
           </div>
         </td>
@@ -283,7 +282,6 @@ setInterval(() => {
   const searchInput = document.getElementById('search-box');
   const isModalOpen = document.getElementById('notes-modal').style.display === 'flex';
   
-  // Only refresh if search is empty AND you aren't currently writing notes in the modal pop-up
   if ((!searchInput || searchInput.value === '') && !isModalOpen) {
     console.log("Auto-refreshing inventory safely from Supabase...");
     loadInventory();

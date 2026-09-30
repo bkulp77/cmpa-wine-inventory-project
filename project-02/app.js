@@ -3,8 +3,16 @@
 
 const supabaseUrl = 'https://nlgwoafmcxzcjknkbmtd.supabase.co'; 
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZ3dvYWZtY3h6Y2prbmtibXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNzY3MzcsImV4cCI6MjEwNDY1MjczN30.azfPDyKXzVVc0YVpV7vbmwhlz6U7AfLvM8surXfVQJI'; 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey); 
 
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
+  global: {
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  }
+}); 
 const tableBody = document.getElementById('table-body'); 
 const searchBox = document.getElementById('search-box'); 
 let inventoryData = [];
@@ -214,14 +222,24 @@ searchBox.addEventListener('input', function(e) {
 });
 
 loadInventory();
-
-setInterval(() => {
-  const searchInput = document.getElementById('search-box');
-  if (!searchInput || searchInput.value === '') {
-    console.log("Auto-refreshing inventory from Supabase...");
+// 7. REAL-TIME DATA STREAM SUBSCRIPTION ENGINE
+supabase
+  .channel('live-inventory-tracker')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory.csv' }, (payload) => {
+    console.log("⚡ Change received instantly! Redrawing user interface components...", payload);
+    
+    // Force a clean reload of the layout rows immediately on any data shift
     loadInventory();
-  }
-}, 5000);
+  })
+  .subscribe((status, error) => {
+    if (status === 'SUBSCRIBED') {
+      console.log('✅ Realtime connected successfully!');
+    } else if (status === 'CHANNEL_ERROR') {
+      console.error('❌ Connection refused by server. Details:', error);
+    }
+  });
+
+
 document.getElementById('wine-data-entry').addEventListener('submit', async function(e) {
   e.preventDefault();
   
@@ -309,15 +327,15 @@ document.getElementById('wine-data-entry').addEventListener('submit', async func
   }
 });
 
-setInterval(() => {
-  const searchInput = document.getElementById('search-box');
-  const isModalOpen = document.getElementById('notes-modal').style.display === 'flex';
-  
-  if ((!searchInput || searchInput.value === '') && !isModalOpen) {
-    console.log("Auto-refreshing inventory safely from Supabase...");
-    loadInventory();
-  }
-}, 5000);
+// Listen for instant database changes on row edits, additions, and updates
+supabase
+  .channel('inventory-changes')
+  .on('postgres_changes', { event: '*', scheme: 'public', table: 'inventory.csv' }, (payload) => {
+     console.log('Database updated in real-time!', payload);
+     loadInventory(); // Instantly refreshes the view when something changes
+  })
+  .subscribe();
+
 if (!error) {
   statusMsg.style.color = "green";
   statusMsg.textContent = "Saved successfully! ✓";

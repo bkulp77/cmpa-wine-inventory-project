@@ -14,7 +14,9 @@ The purpose of this website is to track the wines we have and be able to enjoy t
 
 - **VS Code** - I choose it because it is easy to code with it because I can visually see what my project looks like as I type with the preview and live looks.
 - **GitHub and GitHub Pages** - I choose this because I am able to save parts of the project at a time with timestamps that allow me to go back to previous saves in the project in case something gets broken. It also allows me to put the website live out on the web.
+- **JavaScript** - I choose to use JavaScript because it help transform my static wine inventory table to a more dynamic one that had live inventory tracking by handling calculations and network requests in the background.
+- **Supabase** - Supabase changed my site to a real time inventory, before if I made a change it would disappear after the page refreshed, this gives me an updated live inventory that can be changed from any device.
 
 ## Live Project
 
-[View the project](https://bkulp77.github.io/cmpa-wine-inventory-project/project-01/)
+[View the project](https://bkulp77.github.io/cmpa-wine-inventory-project/project-02/)

@@ -4,15 +4,8 @@
 const supabaseUrl = 'https://nlgwoafmcxzcjknkbmtd.supabase.co'; 
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sZ3dvYWZtY3h6Y2prbmtibXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNzY3MzcsImV4cCI6MjEwNDY1MjczN30.azfPDyKXzVVc0YVpV7vbmwhlz6U7AfLvM8surXfVQJI'; 
 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
-  global: {
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    }
-  }
-}); 
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey); 
+
 const tableBody = document.getElementById('table-body'); 
 const searchBox = document.getElementById('search-box'); 
 let inventoryData = [];
@@ -20,13 +13,12 @@ let inventoryData = [];
 async function loadInventory() {
   try {
     console.log("Attempting secure connection to Supabase...");
-      // 1. Create a unique number based on the exact millisecond time
-    const cacheBuster = new Date().getTime();
     
-    // 2. Pass a valid "not equal" filter on the ID column to bypass the browser cache safely
+    // Select directly from the table, allowing native caching protocols to operate
     const { data, error } = await supabase
-      .from(`inventory.csv?id=not.eq.${cacheBuster}`)
-      .select('');
+      .from('inventory.csv')
+      .select('*'); // Using '*' ensures clean data modeling selection
+
 
 
 
